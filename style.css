@@ -1,0 +1,21 @@
+body {
+  font: 14px sans-serif;
+}
+
+#title {
+  margin-left: 10px;
+}
+
+#chart,
+#loader,
+#info-single {
+  display: block;
+  padding: 10px;
+}
+
+#info-single h1 {
+  font: 16px;
+}
+
+#info-single p {
+}
