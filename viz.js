@@ -17,6 +17,8 @@ var Chart = (function(d3) {
     wineryFilter = document.getElementById("winery-filter"),
     tasterFilter = document.getElementById("taster-filter");
 
+  var brush = d3.brush();
+
   // Load data, then initialize chart
   d3.csv(
     "wine-data-simple.csv",
@@ -102,6 +104,12 @@ var Chart = (function(d3) {
       .attr("dy", "1em")
       .style("text-anchor", "middle")
       .text("Points");
+
+    // Brush
+    chart
+      .append("g")
+      .attr("class", "brush")
+      .call(d3.brush().on("brush", brushed));
 
     // Render the chart
     render(dataset);
