@@ -7,7 +7,6 @@ body {
 }
 
 #chart,
-#loader,
 #info-single {
   display: block;
   padding: 10px;

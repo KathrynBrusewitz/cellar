@@ -2,10 +2,15 @@
 // Slider from https://github.com/bobhaslett/d3-v4-sliders
 
 var Chart = (function(d3) {
-  var data, xMin, xMax, yMin, yMax, xScale, yScale, chart, width, height;
-  var dotColorDefault, dotColorHover, dotOpacityDefault, dotOpacityHover;
-  var margin = {};
-  var infoSingle, priceSlider, sliderValue;
+  // Globals
+  var data, xMin, xMax, yMin, yMax, xScale, yScale, chart, infoSingle;
+  var margin = { top: 20, right: 20, bottom: 50, left: 50 },
+    width = 1000 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+  var dotColorDefault = "black",
+    dotColorHover = "red",
+    dotOpacityDefault = 0.2,
+    dotOpacityHover = 1;
 
   // Load data, then initialize chart
   d3.csv(
@@ -34,49 +39,42 @@ var Chart = (function(d3) {
   function init(csv) {
     data = csv;
 
-    margin = { top: 20, right: 20, bottom: 50, left: 50 };
-    width = 1000 - margin.left - margin.right;
-    height = 500 - margin.top - margin.bottom;
+    infoSingle = d3.select("#info-single");
+    chart = d3.select("#chart");
 
-    dotColorDefault = "black";
-    dotColorHover = "red";
-    dotOpacityDefault = 0.2;
-    dotOpacityHover = 1;
-    sliderValue = 100;
-
-    // Mins and maxes of data domain range
+    // Data domain range
     xMin = d3.min(data, d => d.price);
     xMax = d3.max(data, d => d.price);
     yMin = d3.min(data, d => d.points);
     yMax = d3.max(data, d => d.points);
 
-    infoSingle = d3.select("#info-single");
-    priceSlider = d3
-      .select("#price-slider")
-      .attr("min", xMin)
-      .attr("max", xMax)
-      .property("value", sliderValue)
-      .on("input", function() {
-        // Update the value on slider movement
-        updateSlider(+this.value);
-      });
-
-    // Initialize Y Scale
+    // Initialize Scales
+    xScale = d3
+      .scaleLinear()
+      .domain([xMin, xMax])
+      .range([0, width])
+      .nice();
     yScale = d3
       .scaleLinear()
       .domain([yMin, yMax])
       .range([height, 0])
       .nice();
 
-    // Initialize svg
-    chart = d3
-      .select("#chart")
+    // Initialize main svg
+    chart = chart
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
       .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-    // Horizontal Axis Label
+    // Axis
+    chart
+      .append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(xScale));
+    chart.append("g").call(d3.axisLeft(yScale).tickFormat(d3.format("d")));
+
+    // Axis Labels
     chart
       .append("text")
       .attr(
@@ -85,8 +83,6 @@ var Chart = (function(d3) {
       )
       .style("text-anchor", "middle")
       .text("Price (USD)");
-
-    // Vertical Axis Label
     chart
       .append("text")
       .attr("transform", "rotate(-90)")
@@ -96,29 +92,18 @@ var Chart = (function(d3) {
       .style("text-anchor", "middle")
       .text("Points");
 
-    // Vertical Axis
-    //   tickFormat removes float values (points are whole numbers)
-    chart.append("g").call(d3.axisLeft(yScale).tickFormat(d3.format("d")));
-
     // Render the chart
     render();
   }
 
   function render() {
-    // Redraw X Scale
-    xScale = d3
-      .scaleLinear()
-      .domain([xMin, sliderValue])
-      .range([0, width])
-      .nice();
-
     // Data Join
     dots = chart.selectAll("circle").data(data);
 
-    // Update
+    // Data Update
     dots.attr("class", "update");
 
-    // Enter
+    // Data Enter
     dots
       .enter()
       .append("circle")
@@ -154,18 +139,8 @@ var Chart = (function(d3) {
         this.setAttribute("opacity", dotOpacityDefault);
       });
 
+    // Data Exit
     dots.exit().remove();
-
-    // Redraw Horizontal Axis
-    chart
-      .append("g")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(xScale));
-  }
-
-  function updateSlider(value) {
-    sliderValue = value;
-    render();
   }
 
   return {
