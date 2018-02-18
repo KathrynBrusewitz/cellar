@@ -53,11 +53,23 @@ var Chart = (function(d3) {
     createFilter(wineryFilter, "winery");
     createFilter(tasterFilter, "taster");
 
+    // Initialize main svg
+    chart = chart
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+    // Render the chart
+    render(dataset);
+  }
+
+  function render(data) {
     // Data domain range
-    xMin = d3.min(dataset, d => d.price);
-    xMax = d3.max(dataset, d => d.price);
-    yMin = d3.min(dataset, d => d.points);
-    yMax = d3.max(dataset, d => d.points);
+    xMin = d3.min(data, d => d.price);
+    xMax = d3.max(data, d => d.price);
+    yMin = d3.min(data, d => d.points);
+    yMax = d3.max(data, d => d.points);
 
     // Initialize Scales
     xScale = d3
@@ -71,13 +83,6 @@ var Chart = (function(d3) {
       .range([height, 0])
       .nice();
 
-    // Initialize main svg
-    chart = chart
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", `translate(${margin.left}, ${margin.top})`);
-
     // Axis
     chart
       .append("g")
@@ -85,29 +90,6 @@ var Chart = (function(d3) {
       .call(d3.axisBottom(xScale));
     chart.append("g").call(d3.axisLeft(yScale).tickFormat(d3.format("d")));
 
-    // Axis Labels
-    chart
-      .append("text")
-      .attr(
-        "transform",
-        "translate(" + width / 2 + " ," + (height + margin.top + 20) + ")"
-      )
-      .style("text-anchor", "middle")
-      .text("Price (USD)");
-    chart
-      .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 0 - margin.left)
-      .attr("x", 0 - height / 2)
-      .attr("dy", "1em")
-      .style("text-anchor", "middle")
-      .text("Points");
-
-    // Render the chart
-    render(dataset);
-  }
-
-  function render(data) {
     // Data Join
     dots = chart.selectAll("circle").data(data);
 
@@ -168,6 +150,24 @@ var Chart = (function(d3) {
 
     // Data Exit
     dots.exit().remove();
+
+    // Axis Labels
+    chart
+      .append("text")
+      .attr(
+        "transform",
+        "translate(" + width / 2 + " ," + (height + margin.top + 20) + ")"
+      )
+      .style("text-anchor", "middle")
+      .text("Price (USD)");
+    chart
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x", 0 - height / 2)
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Points");
   }
 
   function createFilter(filter, property) {
