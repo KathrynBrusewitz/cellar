@@ -6,16 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cellar</title>
   <link rel="stylesheet" type="text/css" href="style.css">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <!-- <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script> -->
 </head>
   <body>
-    <h1 id="title">Cellar: An Interactive Wine Dashboard</h1>
+    <h1 id="title">Cellar</h1>
     <svg id="chart"></svg>
-    <div id="priceSlider"></div>
+    <input id="price-slider" type="range" />
     <div id="info-single"></div>
     <div id="list"></div>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
     <script src="viz.js"></script>
   </body>
 </html>
