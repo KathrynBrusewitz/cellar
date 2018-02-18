@@ -13,7 +13,9 @@ var Chart = (function(d3) {
     dotOpacityHover = 1,
     patt = new RegExp("All");
   var varietyFilter = document.getElementById("variety-filter"),
-    countryFilter = document.getElementById("country-filter");
+    countryFilter = document.getElementById("country-filter"),
+    wineryFilter = document.getElementById("winery-filter"),
+    tasterFilter = document.getElementById("taster-filter");
 
   // Load data, then initialize chart
   d3.csv(
@@ -28,7 +30,7 @@ var Chart = (function(d3) {
         province: w.province,
         region_1: w.region_1,
         region_2: w.region_2,
-        taster_name: w.taster_name,
+        taster: w.taster_name,
         taster_twitter_handle: w.taster_twitter_handle,
         title: w.title,
         variety: w.variety,
@@ -45,12 +47,11 @@ var Chart = (function(d3) {
     infoSingle = d3.select("#info-single");
     chart = d3.select("#chart");
 
-    // The following filters could be refactored into a function,
-    //   but I don't really have time right now...
-
     // give function a filter
     createFilter(varietyFilter, "variety");
     createFilter(countryFilter, "country");
+    createFilter(wineryFilter, "winery");
+    createFilter(tasterFilter, "taster");
 
     // Data domain range
     xMin = d3.min(dataset, d => d.price);
@@ -139,26 +140,25 @@ var Chart = (function(d3) {
             "<p>" +
             d.description +
             "</p>" +
-            "<p><b>Country: </b>" +
+            "<div class='infos'><div class='info'><b>Country: </b>" +
             d.country +
-            " " +
-            "<b>Province: </b>" +
-            " " +
+            "</div>" +
+            "<div class='info'><b>Province: </b>" +
             d.province +
-            " " +
-            "<b>Region: </b>" +
-            " " +
+            "</div>" +
+            "<div class='info'><b>Region: </b>" +
             d.region_1 +
-            " " +
+            "</div>" +
+            "<div class='info'>" +
             "<b>Winery: </b>" +
             d.winery +
-            "</p>" +
-            "<p><b>Points: </b>" +
+            "</div>" +
+            "<div class='info'><b>Points: </b>" +
             d.points +
-            " " +
-            "<b>Price: </b>$" +
+            "</div>" +
+            "<div class='info'><b>Price: </b>$" +
             d.price +
-            "</p>"
+            "</div></div>"
         );
       })
       .on("mouseout", function(d) {
@@ -189,8 +189,11 @@ var Chart = (function(d3) {
   }
 
   function filterData() {
+    // this could definitely be refactored, but don't have time right now
     var res1 = patt.test(varietyFilter.value);
     var res2 = patt.test(countryFilter.value);
+    var res4 = patt.test(wineryFilter.value);
+    var res5 = patt.test(tasterFilter.value);
     var filtered = dataset;
 
     if (!res1) {
@@ -202,6 +205,18 @@ var Chart = (function(d3) {
     if (!res2) {
       filtered = filtered.filter(function(d) {
         return d.country == countryFilter.value;
+      });
+    }
+
+    if (!res4) {
+      filtered = filtered.filter(function(d) {
+        return d.winery == wineryFilter.value;
+      });
+    }
+
+    if (!res5) {
+      filtered = filtered.filter(function(d) {
+        return d.taster == tasterFilter.value;
       });
     }
 

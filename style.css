@@ -6,15 +6,33 @@ body {
   margin-left: 10px;
 }
 
+#chart {
+  display: block;
+}
+
 #chart,
 #info-single {
-  display: block;
+  width: 1000px;
   padding: 10px;
+}
+
+#info-single .infos {
+  display: flex;
 }
 
 #info-single h1 {
   font: 16px;
 }
 
-#info-single p {
+#info-single .info {
+  flex-grow: 1;
+}
+
+.filters {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.filters label {
+  padding: 10px;
 }
