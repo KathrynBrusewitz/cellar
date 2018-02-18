@@ -1,16 +1,19 @@
 // Format based on https://blog.webkid.io/responsive-chart-usability-d3/
-// Slider from https://github.com/bobhaslett/d3-v4-sliders
 
 var Chart = (function(d3) {
   // Globals
-  var data, xMin, xMax, yMin, yMax, xScale, yScale, chart, infoSingle;
+  var dataset, chart, infoSingle;
+  var xMin, xMax, yMin, yMax, xScale, yScale;
   var margin = { top: 20, right: 20, bottom: 50, left: 50 },
     width = 1000 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
   var dotColorDefault = "black",
     dotColorHover = "red",
     dotOpacityDefault = 0.2,
-    dotOpacityHover = 1;
+    dotOpacityHover = 1,
+    patt = new RegExp("All");
+  var varietyFilter = document.getElementById("variety-filter"),
+    countryFilter = document.getElementById("country-filter");
 
   // Load data, then initialize chart
   d3.csv(
@@ -37,16 +40,23 @@ var Chart = (function(d3) {
 
   // Called once the data is loaded
   function init(csv) {
-    data = csv;
+    dataset = csv;
 
     infoSingle = d3.select("#info-single");
     chart = d3.select("#chart");
 
+    // The following filters could be refactored into a function,
+    //   but I don't really have time right now...
+
+    // give function a filter
+    createFilter(varietyFilter, "variety");
+    createFilter(countryFilter, "country");
+
     // Data domain range
-    xMin = d3.min(data, d => d.price);
-    xMax = d3.max(data, d => d.price);
-    yMin = d3.min(data, d => d.points);
-    yMax = d3.max(data, d => d.points);
+    xMin = d3.min(dataset, d => d.price);
+    xMax = d3.max(dataset, d => d.price);
+    yMin = d3.min(dataset, d => d.points);
+    yMax = d3.max(dataset, d => d.points);
 
     // Initialize Scales
     xScale = d3
@@ -93,10 +103,10 @@ var Chart = (function(d3) {
       .text("Points");
 
     // Render the chart
-    render();
+    render(dataset);
   }
 
-  function render() {
+  function render(data) {
     // Data Join
     dots = chart.selectAll("circle").data(data);
 
@@ -123,13 +133,30 @@ var Chart = (function(d3) {
           "<h1>" +
             d.title +
             "</h1>" +
+            "<h2>" +
+            d.variety +
+            "</h2>" +
             "<p>" +
             d.description +
             "</p>" +
+            "<p><b>Country: </b>" +
+            d.country +
+            " " +
+            "<b>Province: </b>" +
+            " " +
+            d.province +
+            " " +
+            "<b>Region: </b>" +
+            " " +
+            d.region_1 +
+            " " +
+            "<b>Winery: </b>" +
+            d.winery +
+            "</p>" +
             "<p><b>Points: </b>" +
             d.points +
-            "</p>" +
-            "<p><b>Price: </b>" +
+            " " +
+            "<b>Price: </b>$" +
             d.price +
             "</p>"
         );
@@ -141,6 +168,44 @@ var Chart = (function(d3) {
 
     // Data Exit
     dots.exit().remove();
+  }
+
+  function createFilter(filter, property) {
+    var array = [];
+    filter.onchange = function() {
+      filterData();
+    };
+    dataset.forEach(function(d) {
+      if (!array.includes(d[property])) {
+        array.push(d[property]);
+      }
+    });
+    _.sortBy(array).forEach(function(v) {
+      var el = document.createElement("option");
+      el.textContent = v;
+      el.value = v;
+      filter.appendChild(el);
+    });
+  }
+
+  function filterData() {
+    var res1 = patt.test(varietyFilter.value);
+    var res2 = patt.test(countryFilter.value);
+    var filtered = dataset;
+
+    if (!res1) {
+      filtered = filtered.filter(function(d) {
+        return d.variety == varietyFilter.value;
+      });
+    }
+
+    if (!res2) {
+      filtered = filtered.filter(function(d) {
+        return d.country == countryFilter.value;
+      });
+    }
+
+    render(filtered);
   }
 
   return {

@@ -7,6 +7,7 @@
   <title>Cellar</title>
   <link rel="stylesheet" type="text/css" href="style.css">
   <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="underscore-min.js"></script>
   <!-- <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
   <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script> -->
 </head>
@@ -15,6 +16,16 @@
     <svg id="chart"></svg>
     <div id="info-single"></div>
     <div id="list"></div>
+    <div id="filters">
+      <label for="variety-filter">Variety</label>
+      <select id="variety-filter">
+        <option value="All">All</option>
+      </select>
+      <label for="country-filter">Country</label>
+      <select id="country-filter">
+        <option value="All">All</option>
+      </select>
+    </div>
     <script src="viz.js"></script>
   </body>
 </html>
